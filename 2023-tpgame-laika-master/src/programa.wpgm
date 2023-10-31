@@ -1,0 +1,5 @@
+import san.*
+
+program programa {
+	juego2.iniciar()
+}

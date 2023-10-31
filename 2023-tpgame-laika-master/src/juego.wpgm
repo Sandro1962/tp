@@ -1,0 +1,5 @@
+import batallaDeTanques.*
+
+program juego {
+	batallaDeTanques.iniciar()
+}
