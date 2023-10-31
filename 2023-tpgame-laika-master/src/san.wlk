@@ -1,6 +1,6 @@
 import wollok.game.*
 
-object juego2 {
+object juego {
 	
 	method iniciar() {
 		
@@ -30,7 +30,13 @@ object juego2 {
 		
 		
 	}
-
+method explosion(pos) {
+		const expl = new Explosion(pos = pos)
+		game.addVisual(expl)
+		game.schedule(100, {expl.proximoFrame()})
+		game.schedule(200, {expl.proximoFrame()})
+		game.schedule(300, {game.removeVisual(expl)})
+	}
 	
 	
 	method generarIvasores() {
@@ -45,7 +51,13 @@ object juego2 {
 	
 }
 
-
+class Explosion {
+	var frame = 1
+	var pos
+	method image() = "explosion" + frame + ".png"
+	method position() = pos
+	method proximoFrame() { frame += 1 }
+}
 
 object jugador {
 	var pos = game.at(1,1)
@@ -55,7 +67,28 @@ object jugador {
 	method position(pos1) { pos = pos1}
 	method position() = pos
 	
-	
+	method disparar(){
+			
+		var explosionX
+        var explosionY
+
+            // dispara a X lugar dependiendo hacia donde mira el tanque
+            if (image == "tankearriba.png") {
+                explosionX = pos.x()
+                explosionY = pos.y() + 3
+            } else if (image == "tankeabajo.png") {
+                explosionX = pos.x()
+                explosionY = pos.y() - 3
+            } else if (image == "tankeizquierda.png") {
+                explosionX = pos.x() - 3
+                explosionY = pos.y()
+            } else {
+                explosionX = pos.x() + 3
+                explosionY = pos.y()
+            }
+		juego.explosion(game.at(explosionX, explosionY))
+		
+	}
 	
 }
 
@@ -70,7 +103,7 @@ object movimiento {
 		keyboard.down().onPressDo{ self.mover(abajo,jugador)}
 		keyboard.left().onPressDo{ self.mover(izquierda,jugador)}
 		keyboard.right().onPressDo{ self.mover(derecha,jugador)}
-		
+		keyboard.space().onPressDo{jugador.disparar()}
     }
 
     method mover(direccion,jugador){
@@ -107,7 +140,7 @@ class Enemigo {
 	
 	
 	method aparecer(){
-		position = juego2.posicionAleatoria()
+		position = juego.posicionAleatoria()
 		game.addVisual(self)
 		self.perseguir()
 		//game.schedule(60000,{self.desaparecer()})	
@@ -183,10 +216,81 @@ object generadorEscenario {
         escenario.forEach{ obj => game.removeVisual(obj) }
     }
 }
+    
+/*    
+
+object disparo{
+	method configurarDisparo(jugador){
+		keyboard.space().onPressDo{self.disparar(jugador)}
+	
+	}
+	
+	method direccionDisparo() {
+		var direccionD  
+        if (jugador.image() == "tankearriba.png") {
+            direccionD = disparoArriba
+        } else if (jugador.image() == "tankeabajo.png") {
+            direccionD = disparoAbajo
+        } else if (jugador.image() == "tankeizquierda.png") {
+            direccionD = disparoIzquierda
+        } else {
+            direccionD = disparoDerecha
+        }
+
+        return direccionD
+			
+	}
+	
+	
+	method direccionDisparo() {
+        const direcciones = #{ 
+            "tankearriba.png" -> disparoArriba,
+            "tankeabajo.png" -> disparoAbajo,
+            "tankeizquierda.png" -> disparoIzquierda,
+            "tanke.png" -> disparoDerecha
+        }
+		const direccion = direcciones[jugador.image()]
+        return direccion
+    }
 
 
+	//arreglar	
+	method disparar(jugador) {
+    const posicionDisparo = self.direccionDisparo().posicion(jugador)
+    const posicionX = posicionDisparo[0].toInt()
+    const posicionY = posicionDisparo[1].toInt()
+	   
+    batallaDeTanques.explosion(game.at(posicionX, posicionY))
+           
+	}
+}
 
 
+object disparoIzquierda{   
+    method posicion(jugador){ 
+    	return [jugador.position().x()-1 ,jugador.position().y()]
+    } 
+	
+}
+
+object disparoDerecha{
+	method posicion(jugador) {
+		return [jugador.position().x()+1,jugador.position().y()]
+	}
+}
+
+object disparoArriba{
+	method posicion(jugador){
+		return [jugador.position().x(),jugador.position().y()+1]
+	}
+}
+
+object disparoAbajo{
+	method posicion(jugador){
+		return [jugador.position().x(), jugador.position().y()-1]
+	} 
+}
+*/
 
 
 
